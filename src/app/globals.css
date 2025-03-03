@@ -1,24 +1,155 @@
-@import "tailwindcss";
-
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent: #3b82f6;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --accent: #60a5fa;
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
+  background-image: 
+    linear-gradient(var(--circuit-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--circuit-color) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, transparent 20px, var(--circuit-color) 20px, var(--circuit-color) 21px, transparent 21px);
+  background-size: 50px 50px, 50px 50px, 200px 200px;
+  background-position: center center;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .circuit-container {
+    @apply relative overflow-hidden rounded-lg border border-foreground/10 bg-background/80 backdrop-blur-sm;
+    &::before {
+      content: '';
+      @apply absolute inset-0 pointer-events-none;
+      background-image: 
+        linear-gradient(45deg, var(--circuit-color) 1px, transparent 1px),
+        linear-gradient(-45deg, var(--circuit-color) 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: 0.5;
+    }
+  }
+
+  .tech-text {
+    @apply font-mono tracking-tight;
+    text-shadow: 0 0 10px var(--accent);
+  }
+
+  .circuit-line {
+    @apply absolute bg-foreground/10;
+    &::before, &::after {
+      content: '';
+      @apply absolute w-2 h-2 rounded-full bg-accent/30;
+    }
+  }
+}
+
+/* Circuit Board Background */
+.circuit-background {
+  background-color: var(--background);
+  background-image: 
+    /* Grid Pattern */
+    linear-gradient(var(--circuit-color) var(--dot-size), transparent var(--dot-size)),
+    linear-gradient(90deg, var(--circuit-color) var(--dot-size), transparent var(--dot-size)),
+    /* Diagonal Lines */
+    linear-gradient(45deg, transparent calc(50% - var(--circuit-width)), 
+      var(--circuit-color) calc(50% - var(--circuit-width)), 
+      var(--circuit-color) calc(50% + var(--circuit-width)), 
+      transparent calc(50% + var(--circuit-width))),
+    linear-gradient(-45deg, transparent calc(50% - var(--circuit-width)), 
+      var(--circuit-color) calc(50% - var(--circuit-width)), 
+      var(--circuit-color) calc(50% + var(--circuit-width)), 
+      transparent calc(50% + var(--circuit-width))),
+    /* Radial Gradient for Depth */
+    radial-gradient(circle at 50% 50%, 
+      var(--background) 0%, 
+      color-mix(in srgb, var(--background), transparent 5%) 70%, 
+      color-mix(in srgb, var(--background), var(--circuit-color) 10%) 100%);
+  background-size: 
+    var(--grid-size) var(--grid-size),
+    var(--grid-size) var(--grid-size),
+    calc(var(--grid-size) * 6) calc(var(--grid-size) * 6),
+    calc(var(--grid-size) * 6) calc(var(--grid-size) * 6),
+    100% 100%;
+  background-position: center center;
+}
+
+/* Feature Box Styles */
+.feature-box {
+  @apply relative overflow-hidden rounded-sm border border-foreground/10 bg-background/40 backdrop-blur-sm;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.feature-box::before {
+  content: '';
+  @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+  background: linear-gradient(45deg, transparent 0%, var(--accent-glow) 100%);
+  mix-blend-mode: overlay;
+}
+
+.feature-box:hover::before {
+  @apply opacity-20;
+}
+
+.feature-box::after {
+  content: '';
+  @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+  background: 
+    linear-gradient(90deg, transparent calc(50% - 1px), var(--accent) calc(50% - 1px), var(--accent) calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(0deg, transparent calc(50% - 1px), var(--accent) calc(50% - 1px), var(--accent) calc(50% + 1px), transparent calc(50% + 1px));
+  background-size: 200% 200%;
+  animation: circuit-scan 4s linear infinite;
+}
+
+.feature-box:hover::after {
+  @apply opacity-10;
+}
+
+/* Tooltip Styles */
+.tech-tooltip {
+  @apply font-mono text-sm tracking-wider bg-background/90 border border-accent/20 backdrop-blur-sm;
+  box-shadow: 0 0 20px var(--accent-glow);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Connection Lines */
+.connection-line {
+  @apply absolute bg-accent/10;
+  &::before, &::after {
+    content: '';
+    @apply absolute w-1 h-1 rounded-full bg-accent/30;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+/* Animations */
+@keyframes circuit-scan {
+  0% { background-position: 200% 200%; }
+  100% { background-position: -200% -200%; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
 }
