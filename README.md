@@ -1,61 +1,36 @@
-# rolodexter4demo
-
-A hypersocial blockchain interface simulation with a cyberpunk + BLAME! manga aesthetic. This project visualizes a high-speed, overwhelming social network with billions of simulated users interacting at once.
-
-## Project Overview
-
-rolodexter4demo is a visual simulation of a dystopian social network featuring:
-
-- **Strict black and white aesthetic** inspired by BLAME! manga
-- **Hypersocial data overload** simulating billions of users
-- **High-speed, high-stimulus UI** with jittery, high-frequency animations
-- **Blockchain-powered visuals** with transaction and wallet elements
-- **Pseudo-anonymous identity system** with shifting, glitchy avatars
-- **Automated cursor simulation** for demo recording
-
-## Tech Stack
-
-- Next.js with TypeScript
-- TailwindCSS for styling
-- GSAP for animations
-- Framer Motion for UI components
-- D3.js for network visualizations
-- Simulated blockchain elements
-
-## Project Structure
-
-```
-rolodexter4demo/
-├── public/                  # Static assets
-│   ├── fonts/               # Custom monospace fonts
-│   ├── images/              # SVG icons, ASCII art, glitch patterns
-│   ├── sounds/              # UI interaction sounds
-│   └── cursor/              # Custom cursor visuals
-├── src/
-│   ├── app/                 # Next.js App Router
-│   ├── components/          # React components
-│   │   ├── core/           # Main interface components
-│   │   ├── ui/             # Reusable UI components
-│   │   ├── animations/     # Animation components
-│   │   └── simulation/     # Data generation components
-│   ├── hooks/              # Custom React hooks
-│   ├── utils/              # Utility functions
-│   ├── styles/             # Global styles
-│   └── context/            # React Context providers
-├── CHANGELOG.md            # Project changelog
-└── README.md              # Project documentation
-```
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-1. Clone the repository
-2. Install dependencies (coming soon)
-3. Run the development server (coming soon)
+First, run the development server:
 
-## Development
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-This project is under active development. See [CHANGELOG.md](CHANGELOG.md) for recent changes.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## License
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
