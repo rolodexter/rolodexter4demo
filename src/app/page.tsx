@@ -120,100 +120,17 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-white text-black p-12">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="max-w-7xl mx-auto relative"
-      >
-        <header className="text-center mb-24">
-          <h1 className="text-7xl font-light tracking-tight mb-6">
-            rolodexter4
-          </h1>
-          <p className="text-xl font-mono opacity-60 tracking-wide">
-            [ver.4.0.0]
+    <main className="min-h-screen bg-background p-8">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-4xl font-mono text-foreground mb-4">
+          Test Page
+        </h1>
+        <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
+          <p className="text-foreground">
+            If you can see this styled properly, Tailwind is working!
           </p>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 px-4">
-          {features.map((feature, index) => (
-            <Link key={index} href={feature.link}>
-              <motion.div
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)"
-                }}
-                animate={currentFeature === index ? {
-                  scale: [1, 1.03, 1],
-                  transition: { duration: 0.3 }
-                } : {}}
-                className={`bg-white p-8 border-2 border-black transition-all
-                          ${currentFeature === index ? 
-                            'border-opacity-100 shadow-lg' : 
-                            'border-opacity-20'
-                          } hover:border-opacity-100`}
-              >
-                <div className="text-center">
-                  <h2 className="text-2xl font-light tracking-wide mb-3">
-                    [{feature.text}]
-                  </h2>
-                  <p className="font-mono text-sm opacity-60">
-                    {feature.description}
-                  </p>
-                </div>
-              </motion.div>
-            </Link>
-          ))}
         </div>
-
-        {/* Animated cursor with tooltip */}
-        <motion.div
-          initial={{ x: '50%', y: '50%', scale: 1, opacity: 0 }}
-          animate={cursorControls}
-          className="fixed pointer-events-none z-50"
-        >
-          <div className="relative">
-            {/* Cursor icon */}
-            <div className="absolute -left-2 -top-2 w-4 h-4 border-2 border-black" />
-            
-            {/* Tooltip */}
-            <AnimatePresence>
-              {tourStarted && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={tooltipControls}
-                  className="absolute left-8 top-0 whitespace-nowrap bg-black text-white 
-                            font-mono text-sm px-3 py-2 shadow-lg"
-                >
-                  [{features[currentFeature].text}] {'>'} {features[currentFeature].description}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-
-        {/* Progress indicator */}
-        <div className="fixed top-6 right-8 font-mono text-sm tracking-wide">
-          <span className="opacity-40">tour_progress {'>'}</span>
-          <span className="ml-2 opacity-80">{tourStep}/4</span>
-          <span className="ml-2 opacity-40">{'>'} random_sequence</span>
-        </div>
-
-        {/* Status bar */}
-        <div className="fixed bottom-0 left-0 w-full py-4 px-8 font-mono text-sm 
-                      opacity-60 text-center border-t border-black/20">
-          system.status {'>'} tour_active {'>'} autonomous_navigation
-        </div>
-
-        {/* Global styles */}
-        <style jsx global>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap');
-          
-          body {
-            font-family: 'Inter', sans-serif;
-          }
-        `}</style>
-      </motion.div>
+      </div>
     </main>
   );
 }
