@@ -1,135 +1,54 @@
 'use client';
 
-import Link from 'next/link';
-import { motion, useAnimation, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { Suspense } from 'react';
+import { FeatureTour } from '@/components/core/FeatureTour';
+import { CircuitBackground } from '@/components/three/CircuitBackground';
 
 export default function Home() {
-  const cursorControls = useAnimation();
-  const tooltipControls = useAnimation();
-  const [currentFeature, setCurrentFeature] = useState<number>(0);
-  const [tourStarted, setTourStarted] = useState(false);
-  const [tourStep, setTourStep] = useState<number>(1);
-
-  // Define feature positions and descriptions
-  const features = [
-    {
-      position: { x: '25%', y: '35%' },
-      text: 'network_graph',
-      description: 'real-time visualization of network connections',
-      link: '/network'
-    },
-    {
-      position: { x: '75%', y: '35%' },
-      text: 'blockchain_layer',
-      description: 'live blockchain transaction monitoring',
-      link: '/blockchain'
-    },
-    {
-      position: { x: '25%', y: '75%' },
-      text: 'user_presence',
-      description: 'track active users and their status',
-      link: '/users'
-    },
-    {
-      position: { x: '75%', y: '75%' },
-      text: 'cursor_simulation',
-      description: 'multi-user interaction visualization',
-      link: '/cursors'
-    }
-  ];
-
-  // Shuffle array helper
-  const shuffleArray = (array: typeof features) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  };
-
-  // Start the feature tour
-  useEffect(() => {
-    const startTour = async () => {
-      setTourStarted(true);
-      
-      // Initial appearance
-      await cursorControls.start({
-        x: '50%',
-        y: '50%',
-        opacity: 1,
-        transition: { duration: 0.2 }
-      });
-
-      while (true) {
-        const shuffledFeatures = shuffleArray(features);
-        
-        for (let i = 0; i < shuffledFeatures.length; i++) {
-          setCurrentFeature(i);
-          setTourStep(i + 1);
-          
-          // Move to feature
-          await cursorControls.start({
-            x: shuffledFeatures[i].position.x,
-            y: shuffledFeatures[i].position.y,
-            scale: 1.2,
-            transition: {
-              type: "spring",
-              duration: 0.5,
-              bounce: 0.2
-            }
-          });
-
-          // Show tooltip
-          await tooltipControls.start({
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.2 }
-          });
-
-          // Brief pause
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          // Hide tooltip
-          await tooltipControls.start({
-            opacity: 0,
-            y: 5,
-            transition: { duration: 0.2 }
-          });
-
-          // Reset cursor
-          await cursorControls.start({
-            scale: 1,
-            transition: { duration: 0.2 }
-          });
-        }
-
-        // Return to center
-        await cursorControls.start({
-          x: '50%',
-          y: '50%',
-          transition: { duration: 0.5 }
-        });
-
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-    };
-
-    startTour();
-  }, []);
-
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-mono text-foreground mb-4">
-          Test Page
-        </h1>
-        <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
-          <p className="text-foreground">
-            If you can see this styled properly, Tailwind is working!
+    <main className="relative min-h-screen bg-[rgb(var(--background))]">
+      {/* 3D Circuit Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <Suspense fallback={null}>
+          <CircuitBackground />
+        </Suspense>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto px-4 py-8">
+        {/* Header */}
+        <header className="mb-12">
+          <h1 className="font-mono text-4xl mb-4 glitch-text">
+            ROLODEXTER<span className="text-[rgb(var(--accent-neon))]">.CORE</span>
+          </h1>
+          <p className="text-foreground/60 max-w-2xl">
+            Next-generation network visualization and blockchain monitoring system.
+            Explore the features below to understand the capabilities of this advanced platform.
           </p>
+        </header>
+
+        {/* Feature Tour */}
+        <div className="h-[600px] w-full">
+          <FeatureTour />
         </div>
+
+        {/* System Status */}
+        <footer className="fixed bottom-0 left-0 right-0 bg-white/5 backdrop-blur-sm border-t border-foreground/5">
+          <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-1 h-1 rounded-full bg-[rgb(var(--accent-electric))] pulse-glow" />
+                <span className="status-text">SYSTEM.ONLINE</span>
+              </div>
+              <div className="w-px h-4 bg-foreground/10" />
+              <span className="status-text">VER.4.0.1</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="status-text">NETWORK.STATUS:</span>
+              <span className="text-[rgb(var(--accent-neon))] font-mono text-xs">OPTIMAL</span>
+            </div>
+          </div>
+        </footer>
       </div>
     </main>
   );
