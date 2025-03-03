@@ -1,6 +1,11 @@
 module.exports = {
-  plugins: [
-    'tailwindcss',
-    'autoprefixer',
-  ],
+  plugins: {
+    'tailwindcss': {
+      debug: true,
+      logLevel: 'debug'
+    },
+    'autoprefixer': {
+      debug: true
+    },
+  }
 } 
