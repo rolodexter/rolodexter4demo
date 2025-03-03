@@ -2,154 +2,197 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --accent: #3b82f6;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --accent: #60a5fa;
+    /* Core colors */
+    --background: 249 249 249;
+    --foreground: 26 26 26;
+    --accent-neon: 0 255 255;
+    --accent-electric: 0 123 255;
+    --accent-warning: 255 102 0;
+    
+    /* UI Elements */
+    --grid-size: 40px;
+    --dot-size: 1px;
+    --scan-line-width: 1px;
+    --glow-strength: 0.5;
+    --blur-strength: 8px;
+    
+    /* Animation Timings */
+    --glitch-duration: 200ms;
+    --scan-duration: 2s;
+    --pulse-duration: 4s;
+    
+    /* 3D Effects */
+    --depth-shadow: 0 4px 20px -4px rgba(0, 123, 255, 0.15);
+    --hover-lift: translateY(-1px) translateZ(0);
+  }
+
+  body {
+    @apply bg-[rgb(var(--background))] text-[rgb(var(--foreground))];
+    font-feature-settings: "kern" 1;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-[rgb(var(--accent-electric))] bg-opacity-20 rounded-full;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  background-image: 
-    linear-gradient(var(--circuit-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--circuit-color) 1px, transparent 1px),
-    radial-gradient(circle at 50% 50%, transparent 20px, var(--circuit-color) 20px, var(--circuit-color) 21px, transparent 21px);
-  background-size: 50px 50px, 50px 50px, 200px 200px;
-  background-position: center center;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer components {
-  .circuit-container {
-    @apply relative overflow-hidden rounded-lg border border-foreground/10 bg-background/80 backdrop-blur-sm;
+  .cyberpunk-panel {
+    @apply relative overflow-hidden backdrop-blur-sm;
+    @apply border border-[rgb(var(--accent-electric))] border-opacity-10;
+    @apply bg-white bg-opacity-90;
+    box-shadow: var(--depth-shadow);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+
     &::before {
       content: '';
-      @apply absolute inset-0 pointer-events-none;
-      background-image: 
-        linear-gradient(45deg, var(--circuit-color) 1px, transparent 1px),
-        linear-gradient(-45deg, var(--circuit-color) 1px, transparent 1px);
-      background-size: 20px 20px;
-      opacity: 0.5;
+      @apply absolute inset-0 opacity-0 transition-opacity;
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(var(--accent-neon), 0.1)
+      );
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    &:hover::before {
+      @apply opacity-100;
+    }
+  }
+
+  .circuit-grid {
+    @apply absolute inset-0 pointer-events-none;
+    background-image: 
+      linear-gradient(rgba(var(--foreground), 0.03) var(--dot-size), transparent var(--dot-size)),
+      linear-gradient(90deg, rgba(var(--foreground), 0.03) var(--dot-size), transparent var(--dot-size));
+    background-size: var(--grid-size) var(--grid-size);
+    mask-image: radial-gradient(circle at 50% 50%, black, transparent);
+  }
+
+  .neural-connection {
+    @apply absolute pointer-events-none;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(var(--accent-neon), 0.2),
+      rgba(var(--accent-neon), 0.4),
+      rgba(var(--accent-neon), 0.2),
+      transparent
+    );
+    transform-origin: 0 50%;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .scanner-effect {
+    @apply relative overflow-hidden;
+    &::before {
+      content: '';
+      @apply absolute inset-0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(var(--accent-neon), 0.2),
+        rgba(var(--accent-electric), 0.2),
+        transparent
+      );
+      animation: scanner var(--scan-duration) linear infinite;
     }
   }
 
   .tech-text {
     @apply font-mono tracking-tight;
-    text-shadow: 0 0 10px var(--accent);
+    text-shadow: 0 0 10px rgba(var(--accent-electric), var(--glow-strength));
   }
 
-  .circuit-line {
-    @apply absolute bg-foreground/10;
-    &::before, &::after {
-      content: '';
-      @apply absolute w-2 h-2 rounded-full bg-accent/30;
+  .status-text {
+    @apply font-mono text-xs tracking-wider uppercase;
+    @apply text-[rgb(var(--accent-electric))] text-opacity-60;
+    letter-spacing: 0.2em;
+  }
+}
+
+@layer utilities {
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(var(--accent-neon), var(--glow-strength));
+  }
+
+  .electric-glow {
+    box-shadow: 0 0 20px rgba(var(--accent-electric), var(--glow-strength));
+  }
+
+  .warning-glow {
+    box-shadow: 0 0 20px rgba(var(--accent-warning), var(--glow-strength));
+  }
+
+  .glitch-text {
+    @apply relative;
+    text-shadow: 
+      2px 0 0 rgba(var(--accent-neon), 0.2),
+      -2px 0 0 rgba(var(--accent-warning), 0.2);
+    animation: glitch var(--glitch-duration) steps(2, jump-none) infinite;
+  }
+
+  .pulse-glow {
+    animation: pulse var(--pulse-duration) cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300;
+    &:hover {
+      transform: var(--hover-lift);
     }
   }
 }
 
-/* Circuit Board Background */
-.circuit-background {
-  background-color: var(--background);
-  background-image: 
-    /* Grid Pattern */
-    linear-gradient(var(--circuit-color) var(--dot-size), transparent var(--dot-size)),
-    linear-gradient(90deg, var(--circuit-color) var(--dot-size), transparent var(--dot-size)),
-    /* Diagonal Lines */
-    linear-gradient(45deg, transparent calc(50% - var(--circuit-width)), 
-      var(--circuit-color) calc(50% - var(--circuit-width)), 
-      var(--circuit-color) calc(50% + var(--circuit-width)), 
-      transparent calc(50% + var(--circuit-width))),
-    linear-gradient(-45deg, transparent calc(50% - var(--circuit-width)), 
-      var(--circuit-color) calc(50% - var(--circuit-width)), 
-      var(--circuit-color) calc(50% + var(--circuit-width)), 
-      transparent calc(50% + var(--circuit-width))),
-    /* Radial Gradient for Depth */
-    radial-gradient(circle at 50% 50%, 
-      var(--background) 0%, 
-      color-mix(in srgb, var(--background), transparent 5%) 70%, 
-      color-mix(in srgb, var(--background), var(--circuit-color) 10%) 100%);
-  background-size: 
-    var(--grid-size) var(--grid-size),
-    var(--grid-size) var(--grid-size),
-    calc(var(--grid-size) * 6) calc(var(--grid-size) * 6),
-    calc(var(--grid-size) * 6) calc(var(--grid-size) * 6),
-    100% 100%;
-  background-position: center center;
-}
-
-/* Feature Box Styles */
-.feature-box {
-  @apply relative overflow-hidden rounded-sm border border-foreground/10 bg-background/40 backdrop-blur-sm;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.feature-box::before {
-  content: '';
-  @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-  background: linear-gradient(45deg, transparent 0%, var(--accent-glow) 100%);
-  mix-blend-mode: overlay;
-}
-
-.feature-box:hover::before {
-  @apply opacity-20;
-}
-
-.feature-box::after {
-  content: '';
-  @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-  background: 
-    linear-gradient(90deg, transparent calc(50% - 1px), var(--accent) calc(50% - 1px), var(--accent) calc(50% + 1px), transparent calc(50% + 1px)),
-    linear-gradient(0deg, transparent calc(50% - 1px), var(--accent) calc(50% - 1px), var(--accent) calc(50% + 1px), transparent calc(50% + 1px));
-  background-size: 200% 200%;
-  animation: circuit-scan 4s linear infinite;
-}
-
-.feature-box:hover::after {
-  @apply opacity-10;
-}
-
-/* Tooltip Styles */
-.tech-tooltip {
-  @apply font-mono text-sm tracking-wider bg-background/90 border border-accent/20 backdrop-blur-sm;
-  box-shadow: 0 0 20px var(--accent-glow);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Connection Lines */
-.connection-line {
-  @apply absolute bg-accent/10;
-  &::before, &::after {
-    content: '';
-    @apply absolute w-1 h-1 rounded-full bg-accent/30;
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-}
-
-/* Animations */
-@keyframes circuit-scan {
-  0% { background-position: 200% 200%; }
-  100% { background-position: -200% -200%; }
+@keyframes scanner {
+  from { transform: translateX(-100%) skewX(-45deg); }
+  to { transform: translateX(100%) skewX(-45deg); }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.8; }
+  0%, 100% { 
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 
 @keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+  0% { 
+    clip-path: inset(0 0 0 0);
+    transform: translate(0);
+  }
+  2% { 
+    clip-path: inset(10% 0 80% 0);
+    transform: translate(-2px, 2px);
+  }
+  4% { 
+    clip-path: inset(30% 0 50% 0);
+    transform: translate(2px, -2px);
+  }
+  6% { 
+    clip-path: inset(80% 0 10% 0);
+    transform: translate(0);
+  }
+  8%, 100% { 
+    clip-path: inset(0 0 0 0);
+    transform: translate(0);
+  }
 }
