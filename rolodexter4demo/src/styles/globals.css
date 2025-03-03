@@ -42,7 +42,6 @@ body {
     rgb(var(--background-end-rgb))
   );
   min-height: 100vh;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -56,21 +55,20 @@ body {
  * - Maintains accessibility
  */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: #000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+  background: #fff;
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: #00ffff;
 }
 
 /**
@@ -82,8 +80,9 @@ body {
  * - Implements cyberpunk aesthetic
  */
 ::selection {
-  background: rgba(255, 255, 255, 0.2);
-  color: rgb(var(--foreground-rgb));
+  background: #00ffff;
+  color: #000;
+  text-shadow: none;
 }
 
 /**
@@ -100,16 +99,15 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
+  background: repeating-linear-gradient(
     to bottom,
-    transparent 50%,
-    rgba(255, 255, 255, 0.05) 50%
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 0.5%,
+    transparent 1%
   );
-  background-size: 100% 4px;
   pointer-events: none;
-  z-index: 9999;
-  animation: scanline 6s linear infinite;
-  will-change: transform;
+  z-index: 15;
+  animation: scanline 10s linear infinite;
 }
 
 /**
@@ -129,9 +127,7 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   opacity: 0.05;
   pointer-events: none;
-  z-index: 9999;
-  animation: noise 0.2s steps(2) infinite;
-  will-change: opacity;
+  z-index: 10;
 }
 
 /**
@@ -142,13 +138,10 @@ body {
  * - Uses text-shadow for performance
  * - Implements hardware acceleration
  */
-.glitch-text {
+.glitch {
   position: relative;
-  animation: glitch 0.3s linear infinite;
-  text-shadow: 
-    2px 2px var(--cyber-glitch-red),
-    -2px -2px var(--cyber-glitch-blue);
-  will-change: transform;
+  animation: glitch 1s linear infinite;
+  text-shadow: 2px 2px #00ffff, -2px -2px #ff00ff;
 }
 
 /**
@@ -172,5 +165,26 @@ body {
     transform: translateZ(0);
     backface-visibility: hidden;
     perspective: 1000px;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes glitch {
+  2%, 64% {
+    transform: translate(2px, 0) skew(0deg);
+  }
+  4%, 60% {
+    transform: translate(-2px, 0) skew(0deg);
+  }
+  62% {
+    transform: translate(0, 0) skew(5deg);
   }
 } 
