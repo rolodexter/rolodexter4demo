@@ -13,18 +13,18 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "rolodexter4",
-  description: "Next-generation network visualization and interaction",
+  title: "Rolodexter",
+  description: "Next-generation network visualization",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en" className={`${jetbrainsMono.variable} ${spaceGrotesk.variable}`}>
-      <body className="circuit-background min-h-screen text-foreground">
+    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+      <body className="bg-white text-foreground antialiased">
         {/* Circuit Connection Lines */}
         <div className="fixed inset-0 pointer-events-none">
           <div className="connection-line h-px w-1/3 top-24 left-0" />
@@ -38,7 +38,7 @@ export default function RootLayout({
         </div>
 
         {/* HUD Elements */}
-        <div className="fixed top-4 right-4 font-mono text-xs tracking-wider text-accent/70">
+        <div className="fixed top-4 right-4 font-mono text-xs tracking-wider text-accent">
           <div className="flex items-center space-x-2">
             <span className="animate-pulse">●</span>
             <span>[system.status: active]</span>
@@ -51,7 +51,7 @@ export default function RootLayout({
         </main>
 
         {/* Footer Status */}
-        <div className="fixed bottom-0 left-0 w-full py-2 px-4 font-mono text-xs tracking-wider text-foreground/40 text-center border-t border-foreground/5 backdrop-blur-sm">
+        <div className="fixed bottom-0 left-0 w-full py-2 px-4 font-mono text-xs tracking-wider text-foreground/60 text-center border-t border-foreground/10 backdrop-blur-sm bg-white/80">
           <span className="animate-pulse">⟨</span> system.core.initialized <span className="animate-pulse">⟩</span>
         </div>
       </body>
