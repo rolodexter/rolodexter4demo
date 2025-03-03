@@ -1,0 +1,176 @@
+/**
+ * Global CSS Styles
+ * 
+ * Technical Implementation:
+ * - Implements TailwindCSS base styles
+ * - Defines custom CSS variables for theming
+ * - Creates utility classes for animations
+ * - Optimizes performance with hardware acceleration
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * CSS Variables for Theming
+ * 
+ * Technical Implementation:
+ * - Uses CSS custom properties for dynamic values
+ * - Implements dark theme by default
+ * - Provides fallback values for older browsers
+ */
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+}
+
+/**
+ * Base Styles
+ * 
+ * Technical Implementation:
+ * - Sets up dark theme by default
+ * - Implements smooth scrolling
+ * - Optimizes text rendering
+ */
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/**
+ * Custom Scrollbar
+ * 
+ * Technical Implementation:
+ * - Creates minimal, cyberpunk-style scrollbar
+ * - Implements smooth scrolling behavior
+ * - Maintains accessibility
+ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/**
+ * Selection Styles
+ * 
+ * Technical Implementation:
+ * - Customizes text selection appearance
+ * - Maintains contrast for readability
+ * - Implements cyberpunk aesthetic
+ */
+::selection {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgb(var(--foreground-rgb));
+}
+
+/**
+ * Scanline Effect
+ * 
+ * Technical Implementation:
+ * - Creates CRT monitor scanline effect
+ * - Uses pseudo-element for performance
+ * - Implements hardware acceleration
+ */
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(255, 255, 255, 0.05) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanline 6s linear infinite;
+  will-change: transform;
+}
+
+/**
+ * Noise Effect
+ * 
+ * Technical Implementation:
+ * - Creates static noise overlay
+ * - Uses pseudo-element for performance
+ * - Implements hardware acceleration
+ */
+.noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 9999;
+  animation: noise 0.2s steps(2) infinite;
+  will-change: opacity;
+}
+
+/**
+ * Glitch Text Effect
+ * 
+ * Technical Implementation:
+ * - Creates text glitch animation
+ * - Uses text-shadow for performance
+ * - Implements hardware acceleration
+ */
+.glitch-text {
+  position: relative;
+  animation: glitch 0.3s linear infinite;
+  text-shadow: 
+    2px 2px var(--cyber-glitch-red),
+    -2px -2px var(--cyber-glitch-blue);
+  will-change: transform;
+}
+
+/**
+ * Utility Classes
+ * 
+ * Technical Implementation:
+ * - Defines reusable animation classes
+ * - Implements performance optimizations
+ * - Maintains consistent styling
+ */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
+  .hardware-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+} 
