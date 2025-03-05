@@ -1,102 +1,281 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
+import { useRef, useEffect, useState, Suspense } from 'react';
 import { useUIStore } from '@/store/uiStore';
 
 interface CircuitNode {
-  position: THREE.Vector3;
-  connections: number[];
+  x: number;
+  y: number;
+  size: number;
+  pulseSpeed: number;
+  pulseDelay: number;
+  id: string;
 }
 
-interface FrameState {
-  clock: THREE.Clock;
-  camera: THREE.Camera;
-  scene: THREE.Scene;
+interface CircuitLine {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  id: string;
+  animated: boolean;
+  duration: number;
+  delay: number;
 }
 
 export const CircuitBackground = () => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const glitchIntensity = useUIStore(state => state.glitchIntensity);
+  const { glitchIntensity } = useUIStore();
+  const [nodes, setNodes] = useState<CircuitNode[]>([]);
+  const [lines, setLines] = useState<CircuitLine[]>([]);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
-  // Generate circuit nodes
-  const { nodes, geometry } = useMemo(() => {
-    const nodes: CircuitNode[] = [];
-    const points: number[] = [];
-    const colors: number[] = [];
+  // Initialize circuit patterns
+  useEffect(() => {
+    if (!svgRef.current) return;
     
-    // Create grid of nodes
-    for (let i = 0; i < 20; i++) {
-      for (let j = 0; j < 20; j++) {
-        nodes.push({
-          position: new THREE.Vector3(
-            (i - 10) * 2,
-            (j - 10) * 2,
-            0
-          ),
-          connections: []
+    // Update dimensions on mount
+    const updateDimensions = () => {
+      setDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    
+    // Generate circuit nodes
+    const generateNodes = () => {
+      const newNodes: CircuitNode[] = [];
+      const nodeDensity = 150; // Number of nodes
+      
+      for (let i = 0; i < nodeDensity; i++) {
+        newNodes.push({
+          x: Math.random() * dimensions.width,
+          y: Math.random() * dimensions.height,
+          size: Math.random() * 2 + 1,
+          pulseSpeed: 1 + Math.random() * 3,
+          pulseDelay: Math.random() * 5,
+          id: `node-${i}`
         });
+      }
+      
+      setNodes(newNodes);
+    };
+    
+    // Generate circuit connections
+    const generateLines = () => {
+      const newLines: CircuitLine[] = [];
+      const numLines = 120;
+      
+      for (let i = 0; i < numLines; i++) {
+        const startX = Math.random() * dimensions.width;
+        const startY = Math.random() * dimensions.height;
+        const angle = Math.random() * Math.PI * 2;
+        const length = 50 + Math.random() * 150;
         
-        // Add connection points
-        if (Math.random() > 0.7) {
-          points.push(
-            (i - 10) * 2, (j - 10) * 2, 0,
-            (i - 10) * 2 + Math.random() * 2 - 1,
-            (j - 10) * 2 + Math.random() * 2 - 1,
-            Math.random() * 0.5
-          );
-          
-          // Add colors for gradient effect
-          colors.push(
-            0, 0.5, 1, // Electric blue start
-            0, 1, 1  // Neon cyan end
-          );
-        }
+        newLines.push({
+          x1: startX,
+          y1: startY,
+          x2: startX + Math.cos(angle) * length,
+          y2: startY + Math.sin(angle) * length,
+          id: `line-${i}`,
+          animated: Math.random() > 0.5,
+          duration: 2 + Math.random() * 8,
+          delay: Math.random() * 5
+        });
       }
-    }
+      
+      setLines(newLines);
+    };
     
-    // Create geometry
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    generateNodes();
+    generateLines();
     
-    return { nodes, geometry };
-  }, []);
+    // Handle mouse move
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: e.clientX,
+        y: e.clientY
+      });
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    
+    // Occasional regeneration of some elements
+    const regenerationInterval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        // Regenerate a few random lines
+        setLines(prev => {
+          const newLines = [...prev];
+          for (let i = 0; i < 5; i++) {
+            const index = Math.floor(Math.random() * newLines.length);
+            const startX = Math.random() * dimensions.width;
+            const startY = Math.random() * dimensions.height;
+            const angle = Math.random() * Math.PI * 2;
+            const length = 50 + Math.random() * 150;
+            
+            newLines[index] = {
+              x1: startX,
+              y1: startY,
+              x2: startX + Math.cos(angle) * length,
+              y2: startY + Math.sin(angle) * length,
+              id: `line-${Date.now()}-${i}`,
+              animated: Math.random() > 0.5,
+              duration: 2 + Math.random() * 8,
+              delay: Math.random() * 5
+            };
+          }
+          return newLines;
+        });
+      }
+    }, 2000);
+    
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearInterval(regenerationInterval);
+    };
+  }, [dimensions.height, dimensions.width]);
   
-  // Animate circuit paths
-  useFrame((state: FrameState, delta: number) => {
-    if (meshRef.current) {
-      const time = state.clock.getElapsedTime();
-      
-      // Apply glitch effect based on intensity
-      meshRef.current.position.z = Math.sin(time) * 0.1 * glitchIntensity;
-      meshRef.current.rotation.z = Math.sin(time * 0.5) * 0.02 * glitchIntensity;
-      
-      // Update vertex positions for flowing effect
-      const positions = meshRef.current.geometry.attributes.position.array as number[];
-      for (let i = 0; i < positions.length; i += 6) {
-        // Animate only end points of lines
-        positions[i + 3] += Math.sin(time + i) * 0.01;
-        positions[i + 4] += Math.cos(time + i) * 0.01;
-        positions[i + 5] = Math.sin(time * 2 + i) * 0.2;
-      }
-      meshRef.current.geometry.attributes.position.needsUpdate = true;
-    }
-  });
+  // Apply mouse influence to nearby lines
+  useEffect(() => {
+    if (mousePosition.x === 0 && mousePosition.y === 0) return;
+    
+    setLines(prev => {
+      return prev.map(line => {
+        // Check if line is close to mouse
+        const lineCenterX = (line.x1 + line.x2) / 2;
+        const lineCenterY = (line.y1 + line.y2) / 2;
+        
+        const distance = Math.sqrt(
+          Math.pow(lineCenterX - mousePosition.x, 2) + 
+          Math.pow(lineCenterY - mousePosition.y, 2)
+        );
+        
+        // If line is close to mouse, adjust it slightly
+        if (distance < 200) {
+          const influence = (200 - distance) / 200 * 0.2;
+          const angle = Math.atan2(mousePosition.y - lineCenterY, mousePosition.x - lineCenterX);
+          
+          return {
+            ...line,
+            x2: line.x2 + Math.cos(angle) * influence * 20,
+            y2: line.y2 + Math.sin(angle) * influence * 20
+          };
+        }
+        
+        return line;
+      });
+    });
+  }, [mousePosition]);
   
   return (
-    <Canvas>
-      <mesh ref={meshRef}>
-        <lineSegments geometry={geometry}>
-          <lineBasicMaterial
-            vertexColors
-            transparent
-            opacity={0.3}
-            linewidth={1}
+    <div className="fixed inset-0 pointer-events-none">
+      <div className="absolute inset-0 bg-[rgb(var(--background))]" />
+      
+      {/* Circuit grid pattern */}
+      <div className="absolute inset-0 circuit-grid opacity-70" />
+      
+      {/* Circuit SVG elements */}
+      <svg 
+        ref={svgRef}
+        width="100%"
+        height="100%"
+        className="absolute inset-0"
+      >
+        {/* Gradient definitions - pure monochrome */}
+        <defs>
+          <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.4)" />
+            <stop offset="50%" stopColor="rgba(255, 255, 255, 0.6)" />
+            <stop offset="100%" stopColor="rgba(255, 255, 255, 0.2)" />
+          </linearGradient>
+          
+          <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.8)" />
+            <stop offset="100%" stopColor="rgba(255, 255, 255, 0.6)" />
+          </linearGradient>
+          
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
+        </defs>
+        
+        {/* Circuit lines */}
+        {lines.map(line => (
+          <line
+            key={line.id}
+            x1={line.x1}
+            y1={line.y1}
+            x2={line.x2}
+            y2={line.y2}
+            stroke="url(#lineGradient)"
+            strokeWidth={Math.random() > 0.7 ? 1.5 : 1}
+            strokeOpacity={0.5 + Math.random() * 0.3}
+            strokeDasharray={Math.random() > 0.7 ? "4 2" : ""}
+            className={line.animated ? "animate-pulse" : ""}
+            style={{
+              animationDuration: `${line.duration}s`,
+              animationDelay: `${line.delay}s`,
+              filter: Math.random() > 0.8 ? "url(#glow)" : ""
+            }}
           />
-        </lineSegments>
-      </mesh>
-    </Canvas>
+        ))}
+        
+        {/* Circuit nodes */}
+        {nodes.map(node => (
+          <circle
+            key={node.id}
+            cx={node.x}
+            cy={node.y}
+            r={node.size}
+            fill="url(#nodeGradient)"
+            className="animate-pulse"
+            style={{
+              animationDuration: `${node.pulseSpeed}s`,
+              animationDelay: `${node.pulseDelay}s`,
+              filter: "url(#glow)"
+            }}
+          />
+        ))}
+        
+        {/* Random glitch effect when glitchIntensity > 0 */}
+        {glitchIntensity > 0 && Array.from({ length: 5 }).map((_, i) => {
+          const x = Math.random() * dimensions.width;
+          const y = Math.random() * dimensions.height;
+          const width = 20 + Math.random() * 100;
+          const height = 2 + Math.random() * 10;
+          
+          return (
+            <rect
+              key={`glitch-${i}-${Date.now()}`}
+              x={x}
+              y={y}
+              width={width}
+              height={height}
+              fill="rgba(255, 255, 255, 0.3)"
+              style={{ 
+                opacity: glitchIntensity * 0.7,
+                filter: "url(#glow)"
+              }}
+            />
+          );
+        })}
+      </svg>
+    </div>
   );
-}; 
+};
+
+// Keep the fallback for SSR
+export const CircuitBackgroundFallback = () => {
+  return (
+    <div className="fixed inset-0 pointer-events-none">
+      <div className="absolute inset-0 bg-[rgb(var(--background))]" />
+      <div className="absolute inset-0 circuit-grid opacity-70" />
+    </div>
+  );
+};
